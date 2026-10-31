@@ -15,14 +15,14 @@ fi
 
 limine_defaults=/etc/default/limine
 cryptdevice=$(grep -oE 'cryptdevice=[^ "]+' "$limine_defaults" | head -1 || true)
-if [[ -z $cryptdevice ]]; then
-  if grep -q 'rd.luks.name=' "$limine_defaults"; then
-    echo "Kernel command line already uses rd.luks; skipping the switch."
-  else
-    echo "No cryptdevice= in $limine_defaults; is this an encrypted Omarchy install?" >&2
-    exit 1
-  fi
-else
+if [[ -z $cryptdevice ]] && ! grep -q 'rd.luks.name=' "$limine_defaults"; then
+  echo "No cryptdevice= in $limine_defaults; is this an encrypted Omarchy install?" >&2
+  exit 1
+fi
+
+# Two runs. The first switches to the systemd initramfs; the TPM must be enrolled after
+# booting that way, or the measured boot state differs and the TPM refuses to unlock.
+if [[ -n $cryptdevice ]]; then
   # cryptdevice=PARTUUID=xxx:root → the LUKS device and its mapper name
   spec=${cryptdevice#cryptdevice=}
   name=${spec##*:}
@@ -48,11 +48,18 @@ done
 HOOKS=("${_pacos_hooks[@]}")
 unset _pacos_hooks _pacos_hook
 HOOKS
+  limine-mkinitcpio
+  echo "Step 1 of 2 done. Reboot (enter the disk passphrase once more), then run this again."
+  exit 0
 fi
 
-device=${device:-$(blkid -t TYPE=crypto_LUKS -o device | head -1)}
+if ! grep -q 'rd.luks.name=' /proc/cmdline; then
+  echo "Reboot first, then run this again." >&2
+  exit 1
+fi
+
+luks_uuid=$(grep -oE 'rd\.luks\.name=[^= ]+' /proc/cmdline | head -1 | cut -d= -f2)
+device=$(blkid -U "$luks_uuid")
 echo "Enrolling the TPM for $device (enter the current disk passphrase)."
 systemd-cryptenroll --wipe-slot=tpm2 --tpm2-device=auto --tpm2-pcrs=7 "$device"
-
-limine-mkinitcpio
-echo "Done. Reboot: the disk should unlock without a passphrase."
+echo "Step 2 of 2 done. Reboot: the disk should unlock without a passphrase."

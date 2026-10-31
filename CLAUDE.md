@@ -13,5 +13,9 @@ platform initiative (see `~/.claude/CLAUDE.md`). Fizzy: PacOS board, card #43.
 - Student build: no AI tools until the consent/FERPA policy is approved.
 
 ## Status
-- `pacos-teacher` 0.1.0: username login theme, no autologin, OmaCanvas autostart,
-  `pacos-add-teacher`, `pacos-setup-tpm-unlock`. VM test pending.
+- `pacos-teacher` 0.1.0-2 passes in the VM (2026-10-31): username login, no autologin,
+  OmaCanvas at login, teacher has no sudo, Omarchy first-run works for new users,
+  TPM disk unlock (two runs + reboots; enrolling before the systemd initramfs boots fails).
+- Not yet tested on real Framework hardware.
+- Next: pre-fill Canvas email from the login name (OmaCanvas), lock the Limine boot editor
+  (TPM-only unlock + editable kernel command line = root shell), publish the package repo.

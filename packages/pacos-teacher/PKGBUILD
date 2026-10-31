@@ -1,7 +1,7 @@
 # Maintainer: Steven Eno <seno@pacificachristian.org>
 pkgname=pacos-teacher
 pkgver=0.1.0
-pkgrel=1
+pkgrel=2
 pkgdesc="Pacifica teacher setup for Omarchy: username login, Canvas at login"
 arch=('any')
 license=('MIT')

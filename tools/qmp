@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+"""Drive the test VM over QMP: screenshots and typing.
+  tools/qmp shot out.png      screenshot
+  tools/qmp type 'text'       type text (\\n = Enter, \\t = Tab)
+  tools/qmp key ctrl-alt-f3   press a key combo
+"""
+import json, socket, subprocess, sys, time, os
+
+SOCK = os.path.join(os.path.dirname(__file__), "..", "vm", "qmp.sock")
+KEYS = {" ": "spc", "\n": "ret", "\t": "tab", "-": "minus", "=": "equal", ".": "dot", ",": "comma",
+        "/": "slash", ";": "semicolon", "'": "apostrophe", "[": "bracket_left", "]": "bracket_right",
+        "\\": "backslash", "`": "grave_accent"}
+SHIFTED = {"_": "minus", "+": "equal", ">": "dot", "<": "comma", "?": "slash", ":": "semicolon",
+           '"': "apostrophe", "{": "bracket_left", "}": "bracket_right", "|": "backslash", "~": "grave_accent",
+           "!": "1", "@": "2", "#": "3", "$": "4", "%": "5", "^": "6", "&": "7", "*": "8", "(": "9", ")": "0"}
+
+def qmp(cmds):
+    s = socket.socket(socket.AF_UNIX); s.connect(SOCK); f = s.makefile("rw")
+    f.readline()
+    for c in [{"execute": "qmp_capabilities"}] + cmds:
+        f.write(json.dumps(c) + "\n"); f.flush()
+        while True:
+            r = json.loads(f.readline())
+            if "return" in r or "error" in r:
+                if "error" in r: sys.exit(r["error"]["desc"])
+                break
+    s.close()
+
+def keys(names):
+    return {"execute": "send-key", "arguments": {"keys": [{"type": "qcode", "data": n} for n in names]}}
+
+def char(c):
+    if c in SHIFTED: return ["shift", SHIFTED[c]]
+    if c.isupper(): return ["shift", c.lower()]
+    return [KEYS.get(c, c)]
+
+cmd = sys.argv[1]
+if cmd == "shot":
+    out = sys.argv[2]; ppm = out + ".ppm"
+    qmp([{"execute": "screendump", "arguments": {"filename": os.path.abspath(ppm)}}])
+    time.sleep(0.3)
+    subprocess.run(["magick", ppm, "-resize", "1280x>", out], check=True); os.remove(ppm)
+elif cmd == "type":
+    for c in sys.argv[2].encode().decode("unicode_escape"):
+        qmp([keys(char(c))]); time.sleep(0.03)
+elif cmd == "key":
+    qmp([keys(sys.argv[2].split("-"))])
