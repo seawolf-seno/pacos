@@ -1,0 +1,38 @@
+#!/bin/bash
+# Test VM for pacos: UEFI + TPM + KVM, like a Framework. Everything lives in vm/ (gitignored).
+#   tools/vm install   boot the Omarchy ISO to install into a fresh disk
+#   tools/vm           boot the installed disk
+#   tools/vm snapshot <name> | restore <name> | snapshots
+# Inside the VM, the pacos repo is at http://10.0.2.2:8088 (tools/vm serves build/repo).
+set -euo pipefail
+cd "$(dirname "$0")/.."
+mkdir -p vm/tpm
+iso=vm/omarchy-4.0.6.iso
+disk=vm/disk.qcow2
+
+case ${1:-run} in
+  snapshot) qemu-img snapshot -c "$2" "$disk"; exit ;;
+  restore) qemu-img snapshot -a "$2" "$disk"; exit ;;
+  snapshots) qemu-img snapshot -l "$disk"; exit ;;
+esac
+
+[[ -f $disk ]] || qemu-img create -f qcow2 "$disk" 40G
+[[ -f vm/OVMF_VARS.4m.fd ]] || cp /usr/share/edk2/x64/OVMF_VARS.4m.fd vm/
+
+swtpm socket --tpm2 --tpmstate dir=vm/tpm --ctrl type=unixio,path=vm/tpm/sock --daemon
+python -m http.server 8088 --bind 127.0.0.1 --directory build/repo &>/dev/null &
+server=$!
+trap 'kill $server 2>/dev/null' EXIT
+
+args=(
+  -enable-kvm -machine q35 -cpu host -smp 4 -m 6G
+  -drive if=pflash,format=raw,readonly=on,file=/usr/share/edk2/x64/OVMF_CODE.4m.fd
+  -drive if=pflash,format=raw,file=vm/OVMF_VARS.4m.fd
+  -drive file="$disk",if=virtio
+  -chardev socket,id=tpm,path=vm/tpm/sock -tpmdev emulator,id=tpm0,chardev=tpm -device tpm-crb,tpmdev=tpm0
+  -nic user,model=virtio-net-pci,hostfwd=tcp:127.0.0.1:2222-:22
+  -device virtio-vga-gl -display gtk,gl=on
+  -qmp unix:vm/qmp.sock,server,nowait
+)
+[[ ${1:-run} == install ]] && args+=(-cdrom "$iso" -boot d)
+qemu-system-x86_64 "${args[@]}"

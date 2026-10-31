@@ -1,0 +1,9 @@
+[SddmGreeterTheme]
+Name=Pacifica
+Description=Omarchy login with a username field, for shared school machines
+Author=Pacifica Christian
+Type=sddm-theme
+Version=1.0
+MainScript=Main.qml
+ConfigFile=theme.conf
+QtVersion=6

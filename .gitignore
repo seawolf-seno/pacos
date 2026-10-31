@@ -1,0 +1,6 @@
+.fizzy.yaml
+build/
+*.pkg.tar.zst
+vm/
+src/
+pkg/

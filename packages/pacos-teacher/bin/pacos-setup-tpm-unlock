@@ -1,0 +1,58 @@
+#!/bin/bash
+# Unlock the disk with the TPM at boot, so the login screen is the only password prompt.
+# Switches the initramfs to systemd (needed for TPM unlock) and enrolls the TPM in LUKS.
+# The existing disk passphrase keeps working as a fallback.
+set -euo pipefail
+
+if (( EUID != 0 )); then
+  echo "Run with sudo." >&2
+  exit 1
+fi
+if [[ ! -e /dev/tpmrm0 ]]; then
+  echo "No TPM found." >&2
+  exit 1
+fi
+
+limine_defaults=/etc/default/limine
+cryptdevice=$(grep -oE 'cryptdevice=[^ "]+' "$limine_defaults" | head -1 || true)
+if [[ -z $cryptdevice ]]; then
+  if grep -q 'rd.luks.name=' "$limine_defaults"; then
+    echo "Kernel command line already uses rd.luks; skipping the switch."
+  else
+    echo "No cryptdevice= in $limine_defaults; is this an encrypted Omarchy install?" >&2
+    exit 1
+  fi
+else
+  # cryptdevice=PARTUUID=xxx:root → the LUKS device and its mapper name
+  spec=${cryptdevice#cryptdevice=}
+  name=${spec##*:}
+  device=$(blkid -t "${spec%:*}" -o device | head -1)
+  luks_uuid=$(cryptsetup luksUUID "$device")
+
+  cp "$limine_defaults" "$limine_defaults.pacos-backup"
+  sed -i "s|$cryptdevice|rd.luks.name=$luks_uuid=$name rd.luks.options=$luks_uuid=tpm2-device=auto|" "$limine_defaults"
+
+  cat >/etc/mkinitcpio.conf.d/zz_pacos_tpm.conf <<'HOOKS'
+# pacos: systemd initramfs so sd-encrypt can unlock LUKS with the TPM.
+_pacos_hooks=()
+for _pacos_hook in "${HOOKS[@]}"; do
+  case $_pacos_hook in
+    udev) _pacos_hooks+=(systemd) ;;
+    keymap) _pacos_hooks+=(sd-vconsole) ;;
+    consolefont | resume) ;;
+    encrypt) _pacos_hooks+=(sd-encrypt) ;;
+    btrfs-overlayfs) _pacos_hooks+=(sd-btrfs-overlayfs) ;;
+    *) _pacos_hooks+=("$_pacos_hook") ;;
+  esac
+done
+HOOKS=("${_pacos_hooks[@]}")
+unset _pacos_hooks _pacos_hook
+HOOKS
+fi
+
+device=${device:-$(blkid -t TYPE=crypto_LUKS -o device | head -1)}
+echo "Enrolling the TPM for $device (enter the current disk passphrase)."
+systemd-cryptenroll --wipe-slot=tpm2 --tpm2-device=auto --tpm2-pcrs=7 "$device"
+
+limine-mkinitcpio
+echo "Done. Reboot: the disk should unlock without a passphrase."

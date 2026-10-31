@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Canvas
+Comment=Open Canvas at login
+Exec=omacanvas
+X-GNOME-Autostart-enabled=true
