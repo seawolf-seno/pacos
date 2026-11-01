@@ -1,0 +1,8 @@
+#!/bin/bash
+# Prints "student" or "teacher" for a login name. Student names end in their
+# graduation year (beno29); teacher names don't (seno).
+if [[ ${1:-} =~ ^[a-z]+[0-9]{2}$ ]]; then
+  echo student
+else
+  echo teacher
+fi

@@ -1,0 +1,37 @@
+#!/bin/bash
+# Create an account named after a school email: seno@pacificachristian.org → seno.
+# Names ending in a graduation year (beno29) are students: locked-down desktop.
+# No one gets sudo.
+set -euo pipefail
+
+if (( $# != 1 )); then
+  echo "Usage: sudo pacos-add-user <name or name@pacificachristian.org>" >&2
+  exit 1
+fi
+if (( EUID != 0 )); then
+  echo "Run with sudo." >&2
+  exit 1
+fi
+
+user=${1,,}
+user=${user%@pacificachristian.org}
+if [[ ! $user =~ ^[a-z_][a-z0-9_.-]{0,31}$ ]]; then
+  echo "Not a valid username: $user" >&2
+  exit 1
+fi
+if id "$user" &>/dev/null; then
+  echo "$user already exists."
+  exit 0
+fi
+
+role=$(pacos-role "$user")
+if [[ $role == student ]]; then
+  # No /etc/skel: the student home is built by pacos-session-setup.
+  useradd -M -d "/home/$user" -s /bin/bash -c "$user@pacificachristian.org" "$user"
+  PAM_USER=$user pacos-session-setup
+else
+  useradd -m -s /bin/bash -c "$user@pacificachristian.org" "$user"
+fi
+echo "Set a password for $user:"
+passwd "$user"
+echo "Created $user ($role). They can log in now."

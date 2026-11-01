@@ -1,0 +1,3 @@
+#!/bin/bash
+# Run by PAM for text-console logins: students may only use the login screen.
+[[ $(pacos-role "${PAM_USER:-}") != student ]]

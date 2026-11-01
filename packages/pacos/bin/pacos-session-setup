@@ -1,0 +1,50 @@
+#!/bin/bash
+# Run as root by PAM when someone logs in at the login screen (and by pacos-add-user).
+# A student's home folder is fully managed: the folders listed in
+# /usr/share/pacos/student/writable belong to the student, a root-owned skeleton holds
+# the Hyprland config, and anything else is deleted. That keeps them from changing what
+# runs at login (shell profile, autostart, Hyprland config). Fails closed: if this
+# fails, the student can't log in.
+set -euo pipefail
+
+user=${PAM_USER:-${1:-}}
+[[ $(pacos-role "$user") == student ]] || exit 0
+
+home=$(getent passwd "$user" | cut -d: -f6)
+group=$(id -gn "$user")
+[[ $home == /home/?* ]]
+
+skeleton=(.config .config/hypr .config/hypr/hyprland.lua .local .local/share .local/state)
+writable=()
+while read -r dir; do
+  [[ -z $dir || $dir == \#* ]] || writable+=("$dir")
+done </usr/share/pacos/student/writable
+((${#writable[@]}))  # never wipe a home over an empty list
+
+install -d -o root -g "$group" -m 750 "$home"
+
+# Delete strays in the root-owned levels: anything that isn't the skeleton, a writable
+# folder, or a parent of one. Never looks inside a writable folder.
+for parent in "" .config .config/hypr .local .local/share .local/state; do
+  [[ -d $home/$parent && ! -L $home/$parent ]] || continue
+  for path in "$home/${parent:+$parent/}".[!.]* "$home/${parent:+$parent/}"*; do
+    [[ -e $path || -L $path ]] || continue
+    rel=${path#"$home"/}
+    keep=0
+    for item in "${skeleton[@]}" "${writable[@]}"; do
+      [[ $item == "$rel" || $item == "$rel"/* ]] && keep=1
+    done
+    [[ -L $path ]] && keep=0
+    ((keep)) || rm -rf -- "$path"
+  done
+done
+
+# Root-owned skeleton, readable by the student only.
+for dir in .config .config/hypr .local .local/share .local/state; do
+  install -d -o root -g "$group" -m 750 "$home/$dir"
+done
+install -o root -g "$group" -m 640 /usr/share/pacos/student/home-hyprland.lua "$home/.config/hypr/hyprland.lua"
+
+for dir in "${writable[@]}"; do
+  install -d -o "$user" -g "$group" -m 700 "$home/$dir"
+done

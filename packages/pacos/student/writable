@@ -1,0 +1,8 @@
+# Folders a student can write in, relative to their home. Everything else in the
+# home folder is root-owned. Never add anything that is read as configuration or code
+# at login (.config, .local/share/applications, shell profiles, autostart).
+Documents
+Downloads
+.cache
+.local/share/omacanvas
+.local/state/wireplumber

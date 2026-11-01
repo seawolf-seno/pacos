@@ -4,31 +4,38 @@ Pacifica Christian's setup for Omarchy, shipped as Arch packages that sit on top
 Omarchy instead of forking it. Omarchy keeps updating normally; these packages only add
 or override what the school needs.
 
-## Packages
+## Package
 
-| Package | What it does |
-|---|---|
-| `pacos-teacher` | Login screen asks for a username (no autologin). Canvas (OmaCanvas) opens at login. Adds `pacos-add-teacher` and `pacos-setup-tpm-unlock`. |
+`pacos` sets up a shared school machine. The login screen asks for a username; the role
+comes from the name:
 
-`pacos-student` comes later: lockdown (no general browser, no sudo) on the same base.
+| Login name | Role | Desktop |
+|---|---|---|
+| `seno` (no year) | teacher | Full Omarchy. Canvas opens at login. No sudo. |
+| `beno29` (ends in graduation year) | student | Canvas (Super+1), Omawrite (Super+2), Omacalc (Super+3). Nothing else. |
+
+Students: at every login their home folder is rebuilt so only `Documents`, `Downloads`
+and app data are theirs (`/usr/share/pacos/student/writable`); everything else is
+root-owned or deleted, so they can't change what runs at login. Text-console logins are
+refused for students. Super+W closes a window, Super+F full screen, Super+Escape logs out.
 
 ## Build
 
 ```sh
-make repo        # builds pacos-* and ../omacanvas into build/repo (a pacman repo)
+make repo        # builds pacos and ../omacanvas into build/repo (a pacman repo)
 ```
 
-## Set up a teacher machine
+## Set up a machine
 
 ```sh
-sudo pacman -U build/repo/omacanvas-*.pkg.tar.zst build/repo/pacos-teacher-*.pkg.tar.zst
-sudo pacos-add-teacher seno@pacificachristian.org   # login name: seno
+sudo pacman -U build/repo/omacanvas-*.pkg.tar.zst build/repo/pacos-*.pkg.tar.zst
+sudo pacos-add-user seno@pacificachristian.org     # teacher: seno
+sudo pacos-add-user beno29@pacificachristian.org   # student: beno29
 sudo pacos-setup-tpm-unlock                          # step 1: switch boot to systemd; then reboot
 sudo pacos-setup-tpm-unlock                          # step 2: enroll the TPM; after reboot, no disk passphrase
 ```
 
-Teachers have no sudo. Each teacher signs into Canvas once; it stays signed in for their account.
-
+Each person signs into Canvas once; it stays signed in for their account.
 ## Test in a VM
 
 Needs `qemu-desktop edk2-ovmf swtpm`.
@@ -41,4 +48,4 @@ tools/vm restore clean
 tools/qmp shot vm/shots/x.png   # screenshot; tools/qmp type 'text\n' to type
 ```
 
-Snapshots kept in `vm/disk.qcow2`: `omarchy-clean`, `teacher-login-ok`, `teacher-tpm-ok`.
+Snapshots kept in `vm/disk.qcow2`: `omarchy-clean`, `teacher-login-ok`, `teacher-tpm-ok`, `student-ok`.

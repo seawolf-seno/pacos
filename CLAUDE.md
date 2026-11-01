@@ -1,7 +1,7 @@
 # pacos
 
 Pacifica's Omarchy customization for teachers and students. Part of the school dev
-platform initiative (see `~/.claude/CLAUDE.md`). Fizzy: PacOS board, card #43.
+platform initiative (see `~/.claude/CLAUDE.md`). Fizzy: PacOS board, card #43 (teacher), #44 (student).
 
 - **Layer, don't fork.** Packages depend on `omarchy` and override through files that sort
   after Omarchy's (`/etc/sddm.conf.d/zz-*`, `/etc/mkinitcpio.conf.d/zz_*`, `/etc/xdg/autostart`).
@@ -11,12 +11,13 @@ platform initiative (see `~/.claude/CLAUDE.md`). Fizzy: PacOS board, card #43.
 - Test in the VM (`tools/vm`) before any real machine. Login and boot changes can lock a
   machine out.
 - Student build: no AI tools until the consent/FERPA policy is approved.
+- Student role = login name ends in two digits (`pacos-role`). Student homes are managed by
+  `pacos-session-setup`: never add anything read as config/code at login to `writable`.
 
 ## Status
-- `pacos-teacher` 0.1.0-2 passes in the VM (2026-10-31): username login, no autologin,
-  OmaCanvas at login, teacher has no sudo, Omarchy first-run works for new users,
-  TPM disk unlock (two runs + reboots; enrolling before the systemd initramfs boots fails).
+- `pacos` 0.2.0 (was `pacos-teacher`) passes in the VM (2026-10-31): username login, Canvas at
+  login, no sudo, TPM disk unlock (two runs + reboots). Students (`beno29`): only Canvas,
+  Omawrite, Omacalc; managed home; text-console login refused.
 - Not yet tested on real Framework hardware.
-- OmaCanvas 0.1.1 pre-fills the Canvas email from the login name (tested in the VM).
-- Next: lock the Limine boot editor
-  (TPM-only unlock + editable kernel command line = root shell), publish the package repo.
+- Next: Omadesmos (Super+4) and Omaterminus (Super+5) in `student/hyprland.lua` once built;
+  lock the Limine boot editor; a clock/battery indicator for students; host the package repo.

@@ -1,17 +1,22 @@
 # Maintainer: Steven Eno <seno@pacificachristian.org>
-pkgname=pacos-teacher
-pkgver=0.1.0
-pkgrel=2
-pkgdesc="Pacifica teacher setup for Omarchy: username login, Canvas at login"
+pkgname=pacos
+pkgver=0.2.0
+pkgrel=3
+pkgdesc="Pacifica setup for Omarchy: username login, Canvas at login, locked-down student desktop"
 arch=('any')
 license=('MIT')
-depends=('omarchy' 'omacanvas' 'sddm')
+depends=('omarchy' 'omacanvas' 'omawrite' 'omacalc' 'sddm')
 optdepends=('tpm2-tss: unlock the disk with the TPM (pacos-setup-tpm-unlock)')
+provides=('pacos-teacher')
+conflicts=('pacos-teacher')
+replaces=('pacos-teacher')
+install=pacos.install
 
 package() {
   cd "$startdir"
   install -Dm644 zz-pacos-login.conf "$pkgdir/etc/sddm.conf.d/zz-pacos-login.conf"
   install -Dm644 -t "$pkgdir/usr/share/sddm/themes/pacos" sddm/pacos/*
   install -Dm644 pacos-omacanvas.desktop "$pkgdir/etc/xdg/autostart/pacos-omacanvas.desktop"
+  install -Dm644 -t "$pkgdir/usr/share/pacos/student" student/*
   install -Dm755 -t "$pkgdir/usr/bin" bin/*
 }

@@ -1,0 +1,21 @@
+# PAM can't take drop-ins, so add (and on removal, remove) one line each.
+_pam_add() {
+  grep -q "$2" "$1" || sed -i "0,/^$3/s||$4\n&|" "$1"
+}
+
+post_install() {
+  # Students: home folder locked down at every login; no text-console logins.
+  _pam_add /etc/pam.d/sddm pacos-session-setup 'session' \
+    'session     required    pam_exec.so /usr/bin/pacos-session-setup'
+  _pam_add /etc/pam.d/login pacos-tty-guard 'account' \
+    'account    required     pam_exec.so quiet /usr/bin/pacos-tty-guard'
+}
+
+post_upgrade() {
+  post_install
+}
+
+pre_remove() {
+  sed -i '/pacos-session-setup/d' /etc/pam.d/sddm
+  sed -i '/pacos-tty-guard/d' /etc/pam.d/login
+}
