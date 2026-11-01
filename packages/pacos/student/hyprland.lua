@@ -1,4 +1,4 @@
--- Student desktop: only Canvas, Omawrite and Omacalc. Loaded from the student's
+-- Student desktop: only Canvas, Omawrite, Omacalc and Omadesmos. Loaded from the student's
 -- root-owned ~/.config/hypr/hyprland.lua.
 --
 -- Lua modules load only from Omarchy's install, never from the home folder, so a
@@ -19,11 +19,12 @@ hl.on("hyprland.start", function()
   hl.exec_cmd("dbus-update-activation-environment --systemd --all")
 end)
 
--- Add Omadesmos (4) and Omaterminus (5) here once they ship.
+-- Add Omaterminus (5) here once it ships.
 local apps = {
   { key = "1", name = "Canvas", match = "OmaCanvas", command = "omacanvas" },
   { key = "2", name = "Omawrite", match = "omawrite", command = "omawrite" },
   { key = "3", name = "Omacalc", match = "omacalc", command = "omacalc" },
+  { key = "4", name = "Desmos", match = "OmaDesmos", command = "omadesmos" },
 }
 for _, app in ipairs(apps) do
   o.bind("SUPER + " .. app.key, app.name, { launch = app.command, focus = app.match })

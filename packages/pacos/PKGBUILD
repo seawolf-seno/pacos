@@ -1,11 +1,11 @@
 # Maintainer: Steven Eno <seno@pacificachristian.org>
 pkgname=pacos
 pkgver=0.2.0
-pkgrel=3
+pkgrel=4
 pkgdesc="Pacifica setup for Omarchy: username login, Canvas at login, locked-down student desktop"
 arch=('any')
 license=('MIT')
-depends=('omarchy' 'omacanvas' 'omawrite' 'omacalc' 'sddm')
+depends=('omarchy' 'omacanvas' 'omawrite' 'omacalc' 'omadesmos' 'sddm')
 optdepends=('tpm2-tss: unlock the disk with the TPM (pacos-setup-tpm-unlock)')
 provides=('pacos-teacher')
 conflicts=('pacos-teacher')

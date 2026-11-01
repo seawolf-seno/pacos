@@ -12,7 +12,7 @@ comes from the name:
 | Login name | Role | Desktop |
 |---|---|---|
 | `seno` (no year) | teacher | Full Omarchy. Canvas opens at login. No sudo. |
-| `beno29` (ends in graduation year) | student | Canvas (Super+1), Omawrite (Super+2), Omacalc (Super+3). Nothing else. |
+| `beno29` (ends in graduation year) | student | Canvas (Super+1), Omawrite (Super+2), Omacalc (Super+3), Desmos (Super+4). Nothing else. |
 
 Students: at every login their home folder is rebuilt so only `Documents`, `Downloads`
 and app data are theirs (`/usr/share/pacos/student/writable`); everything else is
