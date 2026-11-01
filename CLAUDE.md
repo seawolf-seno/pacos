@@ -20,6 +20,7 @@ platform initiative (see `~/.claude/CLAUDE.md`). Fizzy: PacOS board, card #43 (t
   Omawrite, Omacalc; managed home; text-console login refused.
 - Not yet tested on real Framework hardware.
 - Omadesmos added (2026-11-01, pkgrel 4): depends, Super+4, writable `.local/share/omadesmos`.
-  Not yet tested in the VM (Fizzy #45).
-- Next: VM-test Omadesmos; Omaterminus (Super+5) in `student/hyprland.lua` once built;
+  VM-tested 2026-11-01: installs, student Super+4 opens Desmos, Graphing works. 3D blank in the
+  VM (virtio-vga has no GPU acceleration); test 3D on a real Framework (Fizzy #45).
+- Next: Omadesmos 3D on a Framework; Omaterminus (Super+5) in `student/hyprland.lua` once built;
   lock the Limine boot editor; a clock/battery indicator for students; host the package repo.
