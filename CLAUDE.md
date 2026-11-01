@@ -17,5 +17,6 @@ platform initiative (see `~/.claude/CLAUDE.md`). Fizzy: PacOS board, card #43.
   OmaCanvas at login, teacher has no sudo, Omarchy first-run works for new users,
   TPM disk unlock (two runs + reboots; enrolling before the systemd initramfs boots fails).
 - Not yet tested on real Framework hardware.
-- Next: pre-fill Canvas email from the login name (OmaCanvas), lock the Limine boot editor
+- OmaCanvas 0.1.1 pre-fills the Canvas email from the login name (tested in the VM).
+- Next: lock the Limine boot editor
   (TPM-only unlock + editable kernel command line = root shell), publish the package repo.
