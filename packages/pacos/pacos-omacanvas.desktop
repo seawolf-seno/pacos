@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
 Name=Canvas
-Comment=Open Canvas at login
-Exec=omacanvas
+Comment=Open Canvas at login (students: PacTerminus until they finish it)
+Exec=pacos-start
 X-GNOME-Autostart-enabled=true

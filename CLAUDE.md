@@ -22,5 +22,8 @@ platform initiative (see `~/.claude/CLAUDE.md`). Fizzy: PacOS board, card #43 (t
 - Omadesmos added (2026-11-01, pkgrel 4): depends, Super+4, writable `.local/share/omadesmos`.
   VM-tested 2026-11-01: installs, student Super+4 opens Desmos, Graphing works. 3D blank in the
   VM (virtio-vga has no GPU acceleration); test 3D on a real Framework (Fizzy #45).
-- Next: Omadesmos 3D on a Framework; Omaterminus (Super+5) in `student/hyprland.lua` once built;
+- PacTerminus gate added (2026-11-01, pkgrel 5, not yet VM-tested): students get Omaterminus
+  (Super+5, repo `../pacterminus`) at login via `bin/pacos-start`; Super+1–4 bind only once
+  `~/.local/share/omaterminus/complete` exists. Fizzy #46.
+- Next: VM-test the PacTerminus gate as a student; Omadesmos 3D on a Framework;
   lock the Limine boot editor; a clock/battery indicator for students; host the package repo.

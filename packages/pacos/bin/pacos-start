@@ -1,0 +1,7 @@
+#!/bin/bash
+# First app at login. Students who haven't finished PacTerminus get it; the other
+# apps stay locked until they do (see /usr/share/pacos/student/hyprland.lua).
+if [[ $(pacos-role "$USER") == student && ! -e $HOME/.local/share/omaterminus/complete ]]; then
+  exec omaterminus
+fi
+exec omacanvas

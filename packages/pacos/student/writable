@@ -6,4 +6,5 @@ Downloads
 .cache
 .local/share/omacanvas
 .local/share/omadesmos
+.local/share/omaterminus
 .local/state/wireplumber

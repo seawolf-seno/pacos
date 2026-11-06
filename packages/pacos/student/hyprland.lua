@@ -1,4 +1,4 @@
--- Student desktop: only Canvas, Omawrite, Omacalc and Omadesmos. Loaded from the student's
+-- Student desktop: PacTerminus first, then Canvas, Omawrite, Omacalc and Omadesmos. Loaded from the student's
 -- root-owned ~/.config/hypr/hyprland.lua.
 --
 -- Lua modules load only from Omarchy's install, never from the home folder, so a
@@ -19,13 +19,23 @@ hl.on("hyprland.start", function()
   hl.exec_cmd("dbus-update-activation-environment --systemd --all")
 end)
 
--- Add Omaterminus (5) here once it ships.
+-- PacTerminus (Super+5) is always there. The other apps unlock once the student has
+-- finished it: Omaterminus writes this file and reloads Hyprland.
+local function quest_done()
+  local f = io.open((os.getenv("HOME") or "") .. "/.local/share/omaterminus/complete", "r")
+  if f then f:close() end
+  return f ~= nil
+end
+
 local apps = {
-  { key = "1", name = "Canvas", match = "OmaCanvas", command = "omacanvas" },
-  { key = "2", name = "Omawrite", match = "omawrite", command = "omawrite" },
-  { key = "3", name = "Omacalc", match = "omacalc", command = "omacalc" },
-  { key = "4", name = "Desmos", match = "OmaDesmos", command = "omadesmos" },
+  { key = "5", name = "PacTerminus", match = "OmaTerminus", command = "omaterminus" },
 }
+if quest_done() then
+  table.insert(apps, { key = "1", name = "Canvas", match = "OmaCanvas", command = "omacanvas" })
+  table.insert(apps, { key = "2", name = "Omawrite", match = "omawrite", command = "omawrite" })
+  table.insert(apps, { key = "3", name = "Omacalc", match = "omacalc", command = "omacalc" })
+  table.insert(apps, { key = "4", name = "Desmos", match = "OmaDesmos", command = "omadesmos" })
+end
 for _, app in ipairs(apps) do
   o.bind("SUPER + " .. app.key, app.name, { launch = app.command, focus = app.match })
 end
