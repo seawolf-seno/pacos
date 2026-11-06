@@ -25,5 +25,11 @@ platform initiative (see `~/.claude/CLAUDE.md`). Fizzy: PacOS board, card #43 (t
 - PacTerminus gate added (2026-11-01, pkgrel 5, not yet VM-tested): students get Omaterminus
   (Super+5, repo `../pacterminus`) at login via `bin/pacos-start`; Super+1–4 bind only once
   `~/.local/share/omaterminus/complete` exists. Fizzy #46.
+- Veyon classroom test (2026-11-05, Fizzy #47): teacher laptop → student Mac Neo (Omarchy,
+  aarch64). View, lock, message, remote control work; demo mode doesn't yet.
+  `third-party/veyon/PKGBUILD` = Veyon 4.11.4 + two patches (built by hand, not by
+  `make repo`). Hyprland's portal lacks RemoteDesktop, so students run
+  `wayvnc -r 127.0.0.1 5900` and Veyon uses its External VNC plugin. Goal: package it as
+  OmaClass, then PR it (Fizzy #48, has full context).
 - Next: VM-test the PacTerminus gate as a student; Omadesmos 3D on a Framework;
   lock the Limine boot editor; a clock/battery indicator for students; host the package repo.
