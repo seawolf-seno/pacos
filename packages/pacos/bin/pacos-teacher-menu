@@ -1,0 +1,27 @@
+#!/bin/bash
+# Add an OmaMastery row to a teacher's Omarchy menu. Its id must not be
+# "apps.omamastery": that is the app's own id, and a menu row with it hides the
+# app from the Apps grid. (The grid shows only apps, so this row doesn't pin it
+# there.) Run as root for a teacher account (pacos-add-user does); safe to rerun.
+set -euo pipefail
+
+user=${1:?usage: pacos-teacher-menu <user>}
+if [[ $(pacos-role "$user") != teacher ]]; then
+  echo "$user is a student; OmaMastery is for teachers." >&2
+  exit 0
+fi
+home=$(getent passwd "$user" | cut -d: -f6)
+menu="$home/.config/omarchy/extensions/omarchy-menu.jsonc"
+[[ -f $menu ]] || exit 0
+grep -q '"apps.pinned-omamastery"' "$menu" && exit 0
+
+# The file is a JSONC object whose last line is its closing brace.
+row='  "apps.pinned-omamastery": {"icon":"󰄨","label":"OmaMastery","description":"Mastery gradebook and planning hub","action":"omamastery"},'
+if [[ $(tail -n 1 "$menu") == "}" ]]; then
+  tmp=$(mktemp)
+  { head -n -1 "$menu"; printf '%s\n}\n' "$row"; } >"$tmp"
+  install -m 644 -o "$user" -g "$(id -gn "$user")" "$tmp" "$menu"
+  rm -f "$tmp"
+else
+  echo "Couldn't add OmaMastery to $menu (unexpected format)." >&2
+fi

@@ -31,6 +31,7 @@ if [[ $role == student ]]; then
   PAM_USER=$user pacos-session-setup
 else
   useradd -m -s /bin/bash -c "$user@pacificachristian.org" "$user"
+  pacos-teacher-menu "$user"
 fi
 echo "Set a password for $user:"
 passwd "$user"
