@@ -32,6 +32,7 @@ if [[ $role == student ]]; then
 else
   useradd -m -s /bin/bash -c "$user@pacificachristian.org" "$user"
   pacos-teacher-menu "$user"
+  pacos-teacher-hyprland "$user"
 fi
 echo "Set a password for $user:"
 passwd "$user"

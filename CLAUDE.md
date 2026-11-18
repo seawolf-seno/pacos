@@ -31,5 +31,14 @@ platform initiative (see `~/.claude/CLAUDE.md`). Fizzy: PacOS board, card #43 (t
   `make repo`). Hyprland's portal lacks RemoteDesktop, so students run
   `wayvnc -r 127.0.0.1 5900` and Veyon uses its External VNC plugin. Goal: package it as
   OmaClass, then PR it (Fizzy #48, has full context).
-- Next: VM-test the PacTerminus gate as a student; Omadesmos 3D on a Framework;
+- Teacher classroom defaults (2026-11-18, pkgrel 7, not yet VM-tested):
+  `teacher/hyprland.lua` adds Super+Ctrl+M to mirror the laptop to a projector and removes
+  hold-Right-Alt dictation (pressing the mirror keys with Right Alt recorded the classroom).
+  `pacos-teacher-hyprland` (run by `pacos-add-user`) adds one line to the end of a teacher's
+  `~/.config/hypr/hyprland.lua` that loads it; existing teachers need it run once.
+  Tested only outside the VM: script is idempotent, the line loads the file and is harmless
+  if pacos is removed. The same two bindings worked live on seno's laptop (no projector test
+  of the new key yet). Teacher cheat sheet: https://claude.ai/artifact/Gpz4GPxocboy4wQM3AcWWq
+- Next: VM-test the teacher classroom defaults (new teacher via `pacos-add-user`, then
+  `hyprctl binds`; check a machine without dictation installed); VM-test the PacTerminus gate as a student; Omadesmos 3D on a Framework;
   lock the Limine boot editor; a clock/battery indicator for students; host the package repo.

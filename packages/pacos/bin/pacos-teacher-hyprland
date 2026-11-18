@@ -1,0 +1,24 @@
+#!/bin/bash
+# Load Pacifica's classroom defaults (/usr/share/pacos/teacher/hyprland.lua) in a
+# teacher's Hyprland config by adding one line to the end of their
+# ~/.config/hypr/hyprland.lua. The line skips the file if pacos is removed, so
+# Hyprland still starts. Run as root for a teacher account (pacos-add-user does);
+# safe to rerun.
+set -euo pipefail
+
+user=${1:?usage: pacos-teacher-hyprland <user>}
+if [[ $(pacos-role "$user") != teacher ]]; then
+  echo "$user is a student; the student desktop has its own config." >&2
+  exit 0
+fi
+home=$(getent passwd "$user" | cut -d: -f6)
+config="$home/.config/hypr/hyprland.lua"
+[[ -f $config ]] || exit 0
+grep -q '/usr/share/pacos/teacher/hyprland.lua' "$config" && exit 0
+
+# Appending keeps the file's owner and mode.
+cat >>"$config" <<'EOF'
+
+-- Pacifica classroom defaults (mirror shortcut and more). Delete these lines to opt out.
+do local f = "/usr/share/pacos/teacher/hyprland.lua"; local h = io.open(f); if h then h:close(); dofile(f) end end
+EOF

@@ -1,7 +1,7 @@
 # Maintainer: Steven Eno <seno@pacificachristian.org>
 pkgname=pacos
 pkgver=0.2.0
-pkgrel=6
+pkgrel=7
 pkgdesc="Pacifica setup for Omarchy: username login, Canvas at login, locked-down student desktop"
 arch=('any')
 license=('MIT')
@@ -18,5 +18,6 @@ package() {
   install -Dm644 -t "$pkgdir/usr/share/sddm/themes/pacos" sddm/pacos/*
   install -Dm644 pacos-omacanvas.desktop "$pkgdir/etc/xdg/autostart/pacos-omacanvas.desktop"
   install -Dm644 -t "$pkgdir/usr/share/pacos/student" student/*
+  install -Dm644 -t "$pkgdir/usr/share/pacos/teacher" teacher/*
   install -Dm755 -t "$pkgdir/usr/bin" bin/*
 }
